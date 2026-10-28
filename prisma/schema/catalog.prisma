@@ -1,0 +1,63 @@
+model Category {
+  id          String    @id @default(cuid())
+  storeId     String
+  name        String
+  description String?
+  color       String?   @default("#3164ce")
+  icon        String?
+  active      Boolean   @default(true)
+  products    Product[]
+  store       Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([storeId, name])
+  @@index([storeId, active])
+}
+
+model Product {
+  id             String               @id @default(cuid())
+  storeId        String
+  name           String
+  sku            String?
+  description    String?
+  category       String?
+  categoryId     String?
+  price          Decimal              @db.Decimal(12, 2)
+  costPrice      Decimal?             @db.Decimal(12, 2)
+  barcode        String?
+  active         Boolean              @default(true)
+  stock          Int?
+  lowStockAlert  Int?                 @default(5)
+  imageUrl       String?
+  variants       ProductVariant[]
+  orderItems     OrderItem[]
+  stockMovements StockMovement[]
+  liveProducts   LiveSessionProduct[]
+  categoryRel    Category?            @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  store          Store                @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  @@unique([storeId, sku])
+  @@index([storeId, name, active])
+  @@index([storeId, categoryId])
+}
+
+model ProductVariant {
+  id             String               @id @default(cuid())
+  productId      String
+  name           String
+  sku            String?
+  price          Decimal?             @db.Decimal(12, 2)
+  costPrice      Decimal?             @db.Decimal(12, 2)
+  barcode        String?
+  stock          Int?
+  active         Boolean              @default(true)
+  product        Product              @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderItems     OrderItem[]
+  stockMovements StockMovement[]
+  liveProducts   LiveSessionProduct[]
+
+  @@index([productId, active])
+}

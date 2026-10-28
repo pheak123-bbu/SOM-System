@@ -1,0 +1,91 @@
+enum SuggestionStatus {
+  PENDING
+  APPROVED
+  NOT_AN_ORDER
+  DUPLICATE
+  DISMISSED
+  FAILED
+}
+
+enum IntentClassification {
+  GENERAL_INQUIRY
+  PRODUCT_INTEREST
+  COMPARING_PRODUCTS
+  ORDER_DETAILS_MISSING
+  AWAITING_CUSTOMER_CONFIRMATION
+  PURCHASE_INTENT
+  PURCHASE_CONFIRMED
+  ORDER_CHANGE_REQUEST
+  CANCELLATION_REQUEST
+  NO_PURCHASE
+  UNKNOWN
+}
+
+model DetectionJob {
+  id             String       @id @default(cuid())
+  storeId        String
+  conversationId String
+  messageId      String?
+  status         String       @default("QUEUED")
+  provider       String?
+  model          String?
+  failure        String?
+  attempts       Int          @default(0)
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  message        Message?     @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  createdAt      DateTime     @default(now())
+  completedAt    DateTime?
+
+  @@unique([messageId])
+  @@index([storeId, status, createdAt])
+  @@index([conversationId, createdAt])
+}
+
+model OrderSuggestion {
+  id             String               @id @default(cuid())
+  storeId        String
+  conversationId String
+  orderId        String?              @unique
+  jobId          String?              @unique
+  status         SuggestionStatus     @default(PENDING)
+  intent         IntentClassification @default(UNKNOWN)
+  confidence     Int
+  extracted      Json
+  missingInfo    String[]
+  explanation    String
+  provider       String?
+  model          String?
+  reviewedAt     DateTime?
+  store          Store                @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  conversation   Conversation         @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  order          Order?               @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  evidence       SuggestionEvidence[]
+  reviews        DetectionReview[]
+  createdAt      DateTime             @default(now())
+
+  @@index([storeId, status, createdAt])
+  @@index([conversationId, createdAt])
+}
+
+model SuggestionEvidence {
+  id           String          @id @default(cuid())
+  suggestionId String
+  messageId    String
+  suggestion   OrderSuggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+  message      Message         @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@unique([suggestionId, messageId])
+}
+
+model DetectionReview {
+  id           String          @id @default(cuid())
+  suggestionId String
+  reviewerId   String
+  decision     String
+  note         String?
+  reviewedAt   DateTime        @default(now())
+  suggestion   OrderSuggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+  reviewer     User            @relation(fields: [reviewerId], references: [id])
+
+  @@index([suggestionId, reviewedAt])
+}

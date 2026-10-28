@@ -1,0 +1,15 @@
+# Local Docker & Services (not supported / needed on Vercel)
+compose.yaml
+Dockerfile
+.dockerignore
+.keycloak
+keycloak
+
+# Test & Local Scripts
+scripts/
+tests/
+vitest.config.ts
+
+# Logs & Local caches
+*.log
+.next/cache

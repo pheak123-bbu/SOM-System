@@ -1,0 +1,57 @@
+enum SalesChannel {
+  FACEBOOK
+  TIKTOK
+  TELEGRAM
+  DIRECT
+  OTHER
+}
+
+model Customer {
+  id               String            @id @default(cuid())
+  storeId          String
+  name             String
+  phone            String?
+  email            String?
+  preferredChannel SalesChannel?
+  telegramUsername String?
+  facebookId       String?
+  codRiskOverride  String?           @default("AUTO")
+  notes            CustomerNote[]
+  addresses        CustomerAddress[]
+  orders           Order[]
+  conversations    Conversation[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  store            Store             @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId, name])
+  @@index([storeId, phone])
+}
+
+model CustomerAddress {
+  id         String   @id @default(cuid())
+  customerId String
+  label      String?
+  recipient  String
+  phone      String?
+  address    String
+  province   String?
+  district   String?
+  commune    String?
+  isDefault  Boolean  @default(false)
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@index([customerId, isDefault])
+  @@index([customerId, province])
+}
+
+model CustomerNote {
+  id         String   @id @default(cuid())
+  customerId String
+  body       String
+  createdAt  DateTime @default(now())
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId, createdAt])
+}

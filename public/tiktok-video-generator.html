@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8">
+  <title>SOM Cambodia - TikTok Ad Video Generator</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap');
+    body {
+      font-family: 'Kantumruy Pro', 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+    .video-viewport {
+      width: 360px;
+      height: 640px;
+      position: relative;
+      background: #0f172a;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45), 0 0 0 6px #1e293b;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8 flex flex-col items-center justify-center">
+
+  <div class="max-w-4xl w-full flex flex-col md:flex-row items-center gap-8 justify-center">
+
+    <!-- Left: TikTok Phone Frame -->
+    <div class="flex flex-col items-center">
+      <div class="video-viewport relative">
+        <canvas id="videoCanvas" width="720" height="1280"></canvas>
+        
+        <!-- TikTok UI Overlay Simulation -->
+        <div class="absolute right-3 bottom-20 flex flex-col items-center gap-4 text-white pointer-events-none opacity-85">
+          <div class="w-10 h-10 rounded-full bg-blue-600 border-2 border-white flex items-center justify-center font-bold text-xs">SOM</div>
+          <div class="flex flex-col items-center"><span class="text-xl">❤️</span><span class="text-[10px]">12.4K</span></div>
+          <div class="flex flex-col items-center"><span class="text-xl">💬</span><span class="text-[10px]">842</span></div>
+          <div class="flex flex-col items-center"><span class="text-xl">↗️</span><span class="text-[10px]">350</span></div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="absolute bottom-1 left-3 right-3 h-1 bg-white/20 rounded-full overflow-hidden">
+          <div id="videoProgressBar" class="h-full bg-blue-500 w-0 transition-all duration-75"></div>
+        </div>
+      </div>
+
+      <!-- Time status -->
+      <div class="mt-3 text-xs text-slate-400 font-mono flex items-center gap-2">
+        <span id="timeDisplay">00:00 / 00:30</span>
+        <span>•</span>
+        <span id="sceneDisplay" class="text-blue-400 font-semibold">Scene 1: Hook</span>
+      </div>
+    </div>
+
+    <!-- Right: Controls & Export Center -->
+    <div class="w-full md:w-96 flex flex-col gap-5 bg-slate-800/80 border border-slate-700 p-6 rounded-2xl shadow-xl">
+      <div>
+        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 mb-2">
+          ✨ AI Video Creator
+        </div>
+        <h1 class="text-xl font-bold text-white">SOM Cambodia TikTok Ad</h1>
+        <p class="text-xs text-slate-400 mt-1">
+          ប្រព័ន្ធបង្កើតវីដេអូផ្សាយពាណិជ្ជកម្មដោយស្វ័យប្រវត្តិ ក្នុងទម្រង់ 9:16 (TikTok & Reels) ជាមួយសំឡេង និងចលនាពេញលេញ។
+        </p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col gap-3">
+        <button id="btnPlayPause" class="w-full py-3 px-4 rounded-xl font-bold text-sm bg-blue-600 hover:bg-blue-500 text-white transition flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30">
+          <span id="playIcon">▶️</span> <span id="playText">ចាក់មើលវីដេអូ (Play Preview)</span>
+        </button>
+
+        <button id="btnRecordExport" class="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30">
+          <span>🔴</span> ថត & ទាញយកវីដេអូ (Export Video MP4)
+        </button>
+      </div>
+
+      <!-- Sound Toggle -->
+      <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900/50 border border-slate-700/60">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">🔊</span>
+          <span class="text-xs text-slate-300 font-medium">សំឡេង Effects (SFX)</span>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" id="soundToggle" class="sr-only peer" checked>
+          <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+        </label>
+      </div>
+
+      <!-- Scenes Overview Checklist -->
+      <div class="space-y-2 text-xs">
+        <div class="text-slate-400 font-semibold mb-1">ដំណាក់កាលវីដេអូ (Ad Scenes):</div>
+        <div class="flex items-center gap-2 text-slate-300 bg-slate-900/40 p-2 rounded-lg">
+          <span class="w-5 h-5 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-[10px]">1</span>
+          <span><b>0-6s:</b> បញ្ហាឈឺក្បាល (ឈប់កត់ដៃ! បាត់ការបញ្ជាទិញ)</span>
+        </div>
+        <div class="flex items-center gap-2 text-slate-300 bg-slate-900/40 p-2 rounded-lg">
+          <span class="w-5 h-5 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-[10px]">2</span>
+          <span><b>6-14s:</b> Telegram AI Auto-Detection (ស្រង់ទំនិញ 1s)</span>
+        </div>
+        <div class="flex items-center gap-2 text-slate-300 bg-slate-900/40 p-2 rounded-lg">
+          <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-[10px]">3</span>
+          <span><b>14-22s:</b> បញ្ជាក់ 1-Click + Bakong KHQR ចេញភ្លាម</span>
+        </div>
+        <div class="flex items-center gap-2 text-slate-300 bg-slate-900/40 p-2 rounded-lg">
+          <span class="w-5 h-5 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-[10px]">4</span>
+          <span><b>22-30s:</b> Live CF Studio ចាប់លេខកូដស្វ័យប្រវត្ត & CTA</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const canvas = document.getElementById('videoCanvas');
+    const ctx = canvas.getContext('2d');
+    const progressBar = document.getElementById('videoProgressBar');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const sceneDisplay = document.getElementById('sceneDisplay');
+    const btnPlayPause = document.getElementById('btnPlayPause');
+    const btnRecordExport = document.getElementById('btnRecordExport');
+    const soundToggle = document.getElementById('soundToggle');
+    const playIcon = document.getElementById('playIcon');
+    const playText = document.getElementById('playText');
+
+    const TOTAL_DURATION = 30; // 30 seconds
+    let currentTime = 0;
+    let isPlaying = false;
+    let isRecording = false;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let lastTimestamp = null;
+    let audioCtx = null;
+
+    // Web Audio SFX Helper
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playTone(freq, type, duration, delay = 0) {
+      if (!soundToggle.checked) return;
+      initAudio();
+      setTimeout(() => {
+        try {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        } catch (e) {}
+      }, delay * 1000);
+    }
+
+    function playSuccessChime() {
+      playTone(523.25, 'sine', 0.15, 0);    // C5
+      playTone(659.25, 'sine', 0.2, 0.1);   // E5
+      playTone(783.99, 'sine', 0.35, 0.2);  // G5
+      playTone(1046.50, 'sine', 0.5, 0.3);  // C6
+    }
+
+    function playAlertSound() {
+      playTone(300, 'sawtooth', 0.2, 0);
+      playTone(250, 'sawtooth', 0.3, 0.15);
+    }
+
+    // Canvas drawing helpers
+    function drawRoundedRect(x, y, w, h, r, fillColor, strokeColor = null, lineWidth = 1) {
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, r);
+      if (fillColor) {
+        ctx.fillStyle = fillColor;
+        ctx.fill();
+      }
+      if (strokeColor) {
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = lineWidth;
+        ctx.stroke();
+      }
+    }
+
+    let soundTriggered = { s1: false, s2: false, s3: false, s4: false };
+
+    function render(t) {
+      ctx.clearRect(0, 0, 720, 1280);
+
+      // Background Gradient
+      const bgGrad = ctx.createLinearGradient(0, 0, 720, 1280);
+      bgGrad.addColorStop(0, '#090d16');
+      bgGrad.addColorStop(1, '#0f172a');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, 720, 1280);
+
+      // Subtle ambient glowing orbs
+      ctx.save();
+      const orb = ctx.createRadialGradient(360, 400, 50, 360, 400, 450);
+      if (t < 6) {
+        orb.addColorStop(0, 'rgba(239, 68, 68, 0.15)');
+      } else if (t < 14) {
+        orb.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
+      } else if (t < 22) {
+        orb.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
+      } else {
+        orb.addColorStop(0, 'rgba(147, 51, 234, 0.2)');
+      }
+      orb.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = orb;
+      ctx.fillRect(0, 0, 720, 1280);
+      ctx.restore();
+
+      // Top Brand Header
+      ctx.save();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 28px "Plus Jakarta Sans", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('SOM CAMBODIA', 360, 90);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '500 18px "Kantumruy Pro", sans-serif';
+      ctx.fillText('ប្រព័ន្ធគ្រប់គ្រងការបញ្ជាទិញ & Live CF ឆ្លាតវៃ', 360, 122);
+      ctx.restore();
+
+      // Scene 1: The Problem Hook (0s - 6s)
+      if (t < 6) {
+        sceneDisplay.textContent = 'Scene 1: Hook (ឈប់កត់ដៃ!)';
+        sceneDisplay.className = 'text-rose-400 font-semibold';
+        if (!soundTriggered.s1 && t > 0.5) {
+          playAlertSound();
+          soundTriggered.s1 = true;
+        }
+
+        const scale = Math.min(1, t * 1.5);
+        ctx.save();
+        ctx.translate(360, 500);
+        ctx.scale(scale, scale);
+        ctx.translate(-360, -500);
+
+        // Warning Badge
+        drawRoundedRect(220, 220, 280, 46, 23, 'rgba(239, 68, 68, 0.15)', '#ef4444', 2);
+        ctx.fillStyle = '#f87171';
+        ctx.font = 'bold 20px "Kantumruy Pro"';
+        ctx.textAlign = 'center';
+        ctx.fillText('⚠️ បញ្ហារបស់អ្នកលក់អនឡាញ', 360, 252);
+
+        // Big Punchy Title
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '800 46px "Kantumruy Pro"';
+        ctx.fillText('ឈប់កត់ដៃទៀតទៅ!', 360, 340);
+
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = '600 24px "Kantumruy Pro"';
+        ctx.fillText('ភ្ញៀវឆាតច្រើន បាត់ Order វង្វេងទំនិញ?', 360, 390);
+
+        // Chaotic Paper Notebook Card
+        drawRoundedRect(100, 440, 520, 440, 24, '#1e293b', '#334155', 2);
+
+        // Notification Badges Floating
+        const pulse = Math.sin(t * 8) * 6;
+        drawRoundedRect(130, 470, 460, 75, 14, '#334155');
+        ctx.fillStyle = '#fca5a5';
+        ctx.font = 'bold 20px "Kantumruy Pro"';
+        ctx.textAlign = 'left';
+        ctx.fillText('📝 កត់សៀវភៅ៖ ច្រឡំ Size / ច្រឡំខេត្ត', 160, 515);
+
+        drawRoundedRect(130, 565, 460, 75, 14, '#334155');
+        ctx.fillStyle = '#fca5a5';
+        ctx.fillText('💬 សារ Telegram & FB ឆ្លើយមិនទាន់ (99+)', 160, 610);
+
+        drawRoundedRect(130, 660, 460, 75, 14, '#334155');
+        ctx.fillStyle = '#fca5a5';
+        ctx.fillText('⏱️ បាត់ការបញ្ជាទិញពេលកំពុង Live!', 160, 705);
+
+        // Big Red X Mark
+        ctx.font = 'bold 70px "Plus Jakarta Sans"';
+        ctx.fillStyle = '#ef4444';
+        ctx.textAlign = 'center';
+        ctx.fillText('❌ ❌ ❌', 360, 810 + pulse);
+
+        ctx.restore();
+      }
+
+      // Scene 2: Telegram AI Detection (6s - 14s)
+      else if (t < 14) {
+        sceneDisplay.textContent = 'Scene 2: AI Detection (ស្រង់សារស្វ័យប្រវត្ត)';
+        sceneDisplay.className = 'text-blue-400 font-semibold';
+        if (!soundTriggered.s2) {
+          playSuccessChime();
+          soundTriggered.s2 = true;
+        }
+
+        const localT = t - 6;
+
+        // Subtitle Hook
+        ctx.save();
+        drawRoundedRect(180, 180, 360, 44, 22, 'rgba(59, 130, 246, 0.15)', '#3b82f6', 2);
+        ctx.fillStyle = '#60a5fa';
+        ctx.font = 'bold 20px "Kantumruy Pro"';
+        ctx.textAlign = 'center';
+        ctx.fillText('⚡ ដំណោះស្រាយ៖ SOM AI Engine', 360, 210);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '800 36px "Kantumruy Pro"';
+        ctx.fillText('អតិថិជនឆាតភ្លាម AI ស្រង់ភ្លែត!', 360, 270);
+        ctx.restore();
+
+        // 1. Incoming Telegram Chat Bubble
+        drawRoundedRect(80, 320, 560, 220, 20, '#1e293b', '#3b82f6', 2);
+        
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 20px "Kantumruy Pro"';
+        ctx.textAlign = 'left';
+        ctx.fillText('✈️ Telegram សារចូលពីអតិថិជន (Phay Veasna)', 110, 365);
+
+        drawRoundedRect(110, 390, 500, 110, 14, '#0f172a');
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '500 20px "Kantumruy Pro"';
+        ctx.fillText('"សួស្ដីបង! សុំយក អាវយឺត Size M ចំនួន ២', 130, 435);
+        ctx.fillText('ផ្ញើមកភ្នំពេញ លេខ 012 345 678"', 130, 475);
+
+        // 2. AI Extraction Card (Glowing)
+        const appear = Math.min(1, Math.max(0, (localT - 2) * 2));
+        ctx.save();
+        ctx.globalAlpha = appear;
+        drawRoundedRect(80, 580, 560, 480, 20, '#0f172a', '#10b981', 3);
+
+        // Header
+        drawRoundedRect(100, 605, 520, 50, 12, 'rgba(16, 185, 129, 0.15)');
+        ctx.fillStyle = '#34d399';
+        ctx.font = 'bold 20px "Kantumruy Pro"';
+        ctx.textAlign = 'left';
+        ctx.fillText('✨ ការរកឃើញការបញ្ជាទិញដោយ AI (95% ជឿជាក់)', 125, 638);
+
+        // Extracted Chips
+        drawRoundedRect(110, 680, 500, 65, 12, '#1e293b');
+        ctx.fillStyle = '#e2e8f0';
+        ctx.font = '600 20px "Kantumruy Pro"';
+        ctx.fillText('📦 មុខទំនិញ: អាវយឺត (Size M) × 2 ឯកតា', 135, 720);
+
+        drawRoundedRect(110, 760, 500, 65, 12, '#1e293b');
+        ctx.fillText('📍 ទីតាំងដឹក: រាជធានីភ្នំពេញ', 135, 800);
+
+        drawRoundedRect(110, 840, 500, 65, 12, '#1e293b');
+        ctx.fillText('📞 ទូរស័ព្ទ: 012 345 678', 135, 880);
+
+        // Estimated Total
+        drawRoundedRect(110, 925, 500, 85, 14, 'rgba(59, 130, 246, 0.15)', '#3b82f6', 2);
+        ctx.fillStyle = '#60a5fa';
+        ctx.font = 'bold 24px "Plus Jakarta Sans"';
+        ctx.fillText('Total: $25.50 (104,550 KHR)', 135, 975);
+
+        ctx.restore();
+      }
+
+      // Scene 3: 1-Click Confirm & Bakong KHQR (14s - 22s)
+      else if (t < 22) {
+        sceneDisplay.textContent = 'Scene 3: 1-Click Invoice & Bakong KHQR';
+        sceneDisplay.className = 'text-emerald-400 font-semibold';
+        if (!soundTriggered.s3) {
+          playSuccessChime();
+          soundTriggered.s3 = true;
+        }
+
+        ctx.save();
+        drawRoundedRect(190, 180, 340, 44, 22, 'rgba(16, 185, 129, 0.15)', '#10b981', 2);
+        ctx.fillStyle = '#34d399';
+        ctx.font = 'bold 20px "Kantumruy Pro"';
+        ctx.textAlign = 'center';
+        ctx.fillText('⚡ 1-Click Approve & Confirm', 360, 210);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '800 36px "Kantumruy Pro"';
+        ctx.fillText('ចេញវិក្កយបត្រ + Bakong KHQR ភ្លាមៗ!', 360, 270);
+        ctx.restore();
+
+        // 1-Click Button Animation
+        const btnScale = 1 + Math.sin(t * 6) * 0.04;
+        ctx.save();
+        ctx.translate(360, 350);
+        ctx.scale(btnScale, btnScale);
+        ctx.translate(-360, -350);
+        drawRoundedRect(140, 320, 440, 70, 16, '#16a34a', '#86efac', 3);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 26px "Kantumruy Pro"';
+        ctx.textAlign = 'center';
+        ctx.fillText('⚡ បញ្ជាក់ភ្លាមៗ (CONFIRMED)', 360, 365);
+        ctx.restore();
+
+        // Simulated KHQR & Invoice Card
+        drawRoundedRect(90, 430, 540, 640, 24, '#ffffff', '#e2e8f0', 2);
+
+        // Header Invoice
+        ctx.fillStyle = '#0f172a';
+        ctx.font = 'bold 26px "Plus Jakarta Sans"';
+        ctx.textAlign = 'center';
+        ctx.fillText('INVOICE #SS-10492', 360, 490);
+
+        ctx.fillStyle = '#16a34a';
+        ctx.font = 'bold 18px "Kantumruy Pro"';
+        ctx.fillText('✅ ស្ថានភាព៖ បានបញ្ជាក់ (Confirmed)', 360, 525);
+
+        // QR Box Simulation
+        drawRoundedRect(220, 560, 280, 280, 16, '#f8fafc', '#cbd5e1', 2);
+
+        // Simulated QR pattern lines
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(250, 590, 70, 70);
+        ctx.fillRect(400, 590, 70, 70);
+        ctx.fillRect(250, 740, 70, 70);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(265, 605, 40, 40);
+        ctx.fillRect(415, 605, 40, 40);
+        ctx.fillRect(265, 755, 40, 40);
+
+        // Bakong Logo Center
+        drawRoundedRect(325, 665, 70, 70, 12, '#e11d48');
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 14px "Plus Jakarta Sans"';
+        ctx.textAlign = 'center';
+        ctx.fillText('KHQR', 360, 707);
+
+        // Total Text
+        ctx.fillStyle = '#0f172a';
+        ctx.font = '800 34px "Plus Jakarta Sans"';
+        ctx.fillText('$25.50', 360, 890);
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = '600 20px "Kantumruy Pro"';
+        ctx.fillText('ស្កេនទូទាត់តាម Bakong KHQR គ្រប់ធនាគារ', 360, 930);
+
+        // Shipping Label Ready
+        drawRoundedRect(130, 970, 460, 60, 12, '#eff6ff', '#bfdbfe', 2);
+        ctx.fillStyle = '#1d4ed8';
+        ctx.font = 'bold 18px "Kantumruy Pro"';
+        ctx.fillText('🚚 ស្លាកដឹកជញ្ជូន J&T / Virak Buntham រួចរាល់!', 360, 1007);
+      }
+
+      // Scene 4: Live CF Studio & Call to Action (22s - 30s)
+      else {
+        sceneDisplay.textContent = 'Scene 4: Live CF Studio & CTA';
+        sceneDisplay.className = 'text-purple-400 font-semibold';
+        if (!soundTriggered.s4) {
+          playSuccessChime();
+          soundTriggered.s4 = true;
+        }
+
+        ctx.save();
+        drawRoundedRect(170, 180, 380, 44, 22, 'rgba(147, 51, 234, 0.15)', '#a855f7', 2);
+        ctx.fillStyle = '#c084fc';
+        ctx.font = 'bold 20px "Kantumruy Pro"';
+        ctx.textAlign = 'center';
+        ctx.fillText('📡 Live CF Studio ស្វ័យប្រវត្ត', 360, 210);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '800 38px "Kantumruy Pro"';
+        ctx.fillText('ឡាយលក់ដាច់ ចាប់ CF ភ្លាមៗ!', 360, 270);
+        ctx.restore();
+
+        // Live Feed Mockup
+        drawRoundedRect(90, 320, 540, 360, 20, '#1e293b', '#a855f7', 2);
+        
+        ctx.fillStyle = '#f43f5e';
+        ctx.font = 'bold 18px "Plus Jakarta Sans"';
+        ctx.textAlign = 'left';
+        ctx.fillText('🔴 LIVE STREAMING NOW', 120, 360);
+
+        // Fast Comments
+        const comments = [
+          { user: 'Sokha Ly', text: 'A1=012334455', status: '✅ CF LOCKED #A1' },
+          { user: 'Bona Chen', text: 'A1 មួយបង', status: '✅ CF LOCKED #A1' },
+          { user: 'Dara Keo', text: 'B2=098765432', status: '✅ CF LOCKED #B2' }
+        ];
+
+        comments.forEach((c, idx) => {
+          drawRoundedRect(110, 385 + idx * 80, 500, 65, 12, '#0f172a');
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '600 18px "Kantumruy Pro"';
+          ctx.textAlign = 'left';
+          ctx.fillText(`💬 ${c.user}: ${c.text}`, 130, 425 + idx * 80);
+          ctx.fillStyle = '#34d399';
+          ctx.font = 'bold 15px "Plus Jakarta Sans"';
+          ctx.textAlign = 'right';
+          ctx.fillText(c.status, 590, 425 + idx * 80);
+        });
+
+        // Big CTA Card
+        drawRoundedRect(80, 720, 560, 380, 24, 'linear-gradient(135deg, #1e3a8a, #3b82f6)', '#60a5fa', 2);
+        
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '800 32px "Kantumruy Pro"';
+        ctx.textAlign = 'center';
+        ctx.fillText('ចាប់ផ្ដើមថ្ងៃនេះដោយឥតគិតថ្លៃ!', 360, 790);
+
+        ctx.font = '500 20px "Kantumruy Pro"';
+        ctx.fillStyle = '#bfdbfe';
+        ctx.fillText('គ្រប់គ្រង Telegram, FB, TikTok & Live CF', 360, 835);
+
+        // Big CTA Button
+        drawRoundedRect(130, 880, 460, 75, 20, '#ffffff');
+        ctx.fillStyle = '#1d4ed8';
+        ctx.font = '800 24px "Kantumruy Pro"';
+        ctx.fillText('👉 ចុច Link ក្នុង Bio ដើម្បីសាកល្បង', 360, 928);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '500 16px "Plus Jakarta Sans"';
+        ctx.fillText('www.socialseller.com.kh', 360, 1020);
+      }
+
+      // Update UI Progress
+      const pct = (t / TOTAL_DURATION) * 100;
+      progressBar.style.width = pct + '%';
+      const mins = Math.floor(t / 60).toString().padStart(2, '0');
+      const secs = Math.floor(t % 60).toString().padStart(2, '0');
+      timeDisplay.textContent = `${mins}:${secs} / 00:30`;
+    }
+
+    // Animation Loop
+    function loop(timestamp) {
+      if (!lastTimestamp) lastTimestamp = timestamp;
+      const delta = (timestamp - lastTimestamp) / 1000;
+      lastTimestamp = timestamp;
+
+      if (isPlaying) {
+        currentTime += delta;
+        if (currentTime >= TOTAL_DURATION) {
+          currentTime = 0;
+          soundTriggered = { s1: false, s2: false, s3: false, s4: false };
+          if (isRecording) {
+            stopRecording();
+          }
+        }
+      }
+
+      render(currentTime);
+      requestAnimationFrame(loop);
+    }
+
+    requestAnimationFrame(loop);
+
+    // Play / Pause Toggle
+    btnPlayPause.addEventListener('click', () => {
+      initAudio();
+      isPlaying = !isPlaying;
+      if (isPlaying) {
+        playIcon.textContent = '⏸️';
+        playText.textContent = 'ផ្អាក (Pause Preview)';
+      } else {
+        playIcon.textContent = '▶️';
+        playText.textContent = 'ចាក់មើលវីដេអូ (Play Preview)';
+      }
+    });
+
+    // Recording and Direct Video Export
+    btnRecordExport.addEventListener('click', () => {
+      initAudio();
+      if (isRecording) return;
+      startRecording();
+    });
+
+    function startRecording() {
+      isRecording = true;
+      recordedChunks = [];
+      currentTime = 0;
+      soundTriggered = { s1: false, s2: false, s3: false, s4: false };
+      isPlaying = true;
+      playIcon.textContent = '⏸️';
+      playText.textContent = 'កំពុងថតវីដេអូ…';
+
+      btnRecordExport.classList.remove('from-emerald-500', 'to-teal-600');
+      btnRecordExport.classList.add('bg-rose-600', 'animate-pulse');
+      btnRecordExport.innerHTML = '<span>⏺️</span> កំពុងថតវីដេអូ TikTok (0-30s)…';
+
+      // 30 FPS stream from canvas
+      const stream = canvas.captureStream(30);
+
+      // Support WebM / MP4
+      let options = { mimeType: 'video/webm;codecs=vp9' };
+      if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+        options = { mimeType: 'video/webm' };
+      }
+
+      mediaRecorder = new MediaRecorder(stream, options);
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) {
+          recordedChunks.push(e.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'som-cambodia-tiktok-ad.webm';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+
+        btnRecordExport.classList.remove('bg-rose-600', 'animate-pulse');
+        btnRecordExport.classList.add('from-emerald-500', 'to-teal-600');
+        btnRecordExport.innerHTML = '<span>✅</span> បានទាញយកវីដេអូរួចរាល់! ថតម្ដងទៀត';
+        isPlaying = false;
+        playIcon.textContent = '▶️';
+        playText.textContent = 'ចាក់មើលវីដេអូ (Play Preview)';
+      };
+
+      mediaRecorder.start();
+    }
+
+    function stopRecording() {
+      isRecording = false;
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+    }
+  </script>
+</body>
+</html>

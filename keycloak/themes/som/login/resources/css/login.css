@@ -1,0 +1,420 @@
+/* SOM - Social Seller Order Manager Keycloak Theme (PatternFly 5 / Keycloak 26+) */
+@import url('https://fonts.googleapis.com/css2?family=Battambang:wght@400;700&family=Kantumruy+Pro:ital,wght@0,300..700;1,300..700&family=Koulen&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root,
+html,
+body,
+.pf-v5-theme-dark,
+html.pf-v5-theme-dark {
+  --som-navy: #142c68;
+  --som-blue: #2357c6;
+  --som-blue-hover: #1b49aa;
+  --som-ink: #0f172a;
+  --som-muted: #64748b;
+  --som-border: #e2e8f0;
+  --som-bg-canvas: #f4f7fc;
+
+  /* Force light theme colors even if OS is in dark mode */
+  --pf-v5-global--primary-color--100: var(--som-blue) !important;
+  --pf-v5-global--primary-color--200: var(--som-navy) !important;
+  --pf-v5-c-login--BackgroundColor: transparent !important;
+  --pf-v5-c-login__main--BackgroundColor: #ffffff !important;
+  --pf-v5-c-login__main--Color: var(--som-ink) !important;
+  --pf-v5-c-form-control--BackgroundColor: #ffffff !important;
+  --pf-v5-c-form-control--Color: var(--som-ink) !important;
+  --pf-v5-c-form-control--BorderColor: #cbd5e1 !important;
+  --pf-v5-c-form-control--focus--BorderColor: var(--som-blue) !important;
+  --pf-v5-c-form__label--Color: #1e293b !important;
+  --pf-v5-c-button--m-primary--BackgroundColor: var(--som-blue) !important;
+  --pf-v5-c-button--m-primary--hover--BackgroundColor: var(--som-navy) !important;
+  --pf-v5-c-button--m-primary--Color: #ffffff !important;
+}
+
+html,
+body {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background:
+    radial-gradient(ellipse at 15% 15%, #dce8ff 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 85%, #e8f0fe 0%, transparent 40%),
+    var(--som-bg-canvas) !important;
+  color: var(--som-ink) !important;
+  font-family: "Kantumruy Pro", "Plus Jakarta Sans", "Noto Sans Khmer", -apple-system, sans-serif !important;
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Outer layout */
+.pf-v5-c-login {
+  min-height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 30px 16px !important;
+  background: transparent !important;
+}
+
+.pf-v5-c-login__container {
+  width: 100% !important;
+  max-width: 490px !important;
+  margin: 0 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  box-sizing: border-box !important;
+}
+
+/* Header & Brand Logo */
+#kc-header,
+.pf-v5-c-login__header {
+  margin-bottom: 22px !important;
+  padding: 0 !important;
+  text-align: center !important;
+}
+
+#kc-header-wrapper,
+.pf-v5-c-brand {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 0 !important;
+  text-decoration: none !important;
+}
+
+/* Logo icon mark */
+#kc-header-wrapper::before {
+  content: "" !important;
+  display: block !important;
+  width: 54px !important;
+  height: 54px !important;
+  background: #ffffff url('../img/som-mark.png') no-repeat center !important;
+  background-size: 40px 40px !important;
+  border: 1px solid #dbe6fb !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 14px rgba(20, 44, 104, 0.08) !important;
+}
+
+/* App title and Khmer subtitle */
+#kc-header-wrapper::after {
+  content: "SOM · SOCIAL SELLER" !important;
+  display: block !important;
+  color: var(--som-navy) !important;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+}
+
+/* Main Card */
+main.pf-v5-c-login__main {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  background: #ffffff !important;
+  border: 1px solid var(--som-border) !important;
+  border-top: 4px solid var(--som-blue) !important;
+  border-radius: 20px !important;
+  box-shadow:
+    0 20px 45px -10px rgba(20, 44, 104, 0.14),
+    0 2px 8px rgba(0, 0, 0, 0.04) !important;
+  padding: 34px 34px 28px !important;
+  overflow: visible !important;
+  color: var(--som-ink) !important;
+}
+
+/* Card Header */
+.pf-v5-c-login__main-header {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  text-align: center !important;
+  padding: 0 0 16px !important;
+  margin-bottom: 22px !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+/* Language selector positioned top-right above title with flex order */
+.pf-v5-c-login__main-header-utilities {
+  order: -1 !important;
+  align-self: flex-end !important;
+  position: static !important;
+  margin-bottom: 10px !important;
+}
+
+.pf-v5-c-login__main-header-utilities .pf-v5-c-form-control,
+#login-select-toggle,
+.pf-v5-c-menu-toggle {
+  min-height: 32px !important;
+  height: 32px !important;
+  padding: 0 14px 0 12px !important;
+  background: #f8fafc !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 16px !important;
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #334155 !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.pf-v5-c-login__main-header-utilities .pf-v5-c-form-control__utilities {
+  right: 6px !important;
+}
+
+/* Page title */
+h1#kc-page-title,
+.pf-v5-c-title {
+  margin: 0 !important;
+  color: var(--som-navy) !important;
+  font-family: "Kantumruy Pro", "Plus Jakarta Sans", sans-serif !important;
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+  letter-spacing: normal !important;
+  text-align: center !important;
+}
+
+/* Subtitle under title */
+.pf-v5-c-login__main-header::after {
+  content: "សូមបញ្ចូលគណនីរបស់អ្នកដើម្បីចូលគ្រប់គ្រងការលក់" !important;
+  display: block !important;
+  margin-top: 8px !important;
+  color: var(--som-muted) !important;
+  font-family: "Kantumruy Pro", sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  line-height: 1.6 !important;
+}
+
+@media (max-width: 480px) {
+  .pf-v5-c-login__main-header::after {
+    white-space: normal !important;
+  }
+}
+
+/* Form layout */
+.pf-v5-c-form {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+}
+
+.pf-v5-c-form__group {
+  margin: 0 !important;
+}
+
+.pf-v5-c-form__group-label {
+  padding-bottom: 6px !important;
+}
+
+.pf-v5-c-form__label-text {
+  color: #1e293b !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
+/* Input elements */
+.pf-v5-c-form-control {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.pf-v5-c-form-control::before,
+.pf-v5-c-form-control::after {
+  display: none !important;
+}
+
+.pf-v5-c-form-control input,
+input.pf-v5-c-form-control {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  min-height: 46px !important;
+  height: 46px !important;
+  padding: 0 14px !important;
+  border: 1.5px solid #cbd5e1 !important;
+  border-radius: 9px !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.pf-v5-c-form-control input:focus,
+input.pf-v5-c-form-control:focus,
+.pf-v5-c-form-control:focus-within {
+  border-color: var(--som-blue) !important;
+  box-shadow: 0 0 0 3px rgba(35, 87, 198, 0.16) !important;
+  outline: none !important;
+}
+
+/* Input group with show/hide password toggle */
+.pf-v5-c-input-group {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: stretch !important;
+  border: 1.5px solid #cbd5e1 !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  overflow: hidden !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.pf-v5-c-input-group:focus-within {
+  border-color: var(--som-blue) !important;
+  box-shadow: 0 0 0 3px rgba(35, 87, 198, 0.16) !important;
+}
+
+.pf-v5-c-input-group .pf-v5-c-input-group__item,
+.pf-v5-c-input-group .pf-v5-c-form-control {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  flex: 1 1 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+}
+
+.pf-v5-c-input-group input.pf-v5-c-form-control,
+.pf-v5-c-input-group .pf-v5-c-form-control input {
+  border: none !important;
+  box-shadow: none !important;
+  height: 46px !important;
+  min-height: 46px !important;
+  padding: 0 14px !important;
+  width: 100% !important;
+}
+
+.pf-v5-c-input-group .pf-v5-c-button.pf-m-control,
+button#password-show-password {
+  border: none !important;
+  background: transparent !important;
+  color: #64748b !important;
+  padding: 0 14px !important;
+  min-height: 46px !important;
+  height: 46px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  flex: 0 0 auto !important;
+  transition: color 0.15s ease !important;
+}
+}
+
+button#password-show-password:hover {
+  color: var(--som-blue) !important;
+}
+
+/* Submit button */
+.pf-v5-c-button.pf-m-primary.pf-m-block,
+button#kc-login {
+  width: 100% !important;
+  min-height: 48px !important;
+  height: 48px !important;
+  margin-top: 8px !important;
+  border: none !important;
+  border-radius: 10px !important;
+  background: linear-gradient(135deg, #2357c6 0%, #142c68 100%) !important;
+  color: #ffffff !important;
+  font-family: inherit !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  letter-spacing: normal !important;
+  box-shadow: 0 4px 14px rgba(35, 87, 198, 0.28) !important;
+  cursor: pointer !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease !important;
+}
+
+button#kc-login:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 18px rgba(35, 87, 198, 0.35) !important;
+}
+
+/* Submit button active */
+button#kc-login:active {
+  transform: translateY(0) !important;
+}
+
+/* Alert & Error notifications */
+.pf-v5-c-alert {
+  padding: 10px 14px !important;
+  margin-bottom: 16px !important;
+  border-radius: 9px !important;
+  font-size: 12px !important;
+  line-height: 1.5 !important;
+}
+
+.pf-v5-c-alert.pf-m-danger {
+  background: #fef2f2 !important;
+  border: 1px solid #fecaca !important;
+  color: #991b1b !important;
+}
+
+.pf-v5-c-alert__title {
+  color: inherit !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
+/* Helper text */
+.pf-v5-c-form__helper-text {
+  color: var(--som-muted) !important;
+  font-size: 11px !important;
+}
+
+/* Main card footer */
+.pf-v5-c-login__main-footer {
+  margin-top: 22px !important;
+  padding-top: 14px !important;
+  border-top: 1px solid #f1f5f9 !important;
+  text-align: center !important;
+  font-size: 11px !important;
+  color: #94a3b8 !important;
+}
+
+.pf-v5-c-login__main-footer::after {
+  content: "🛡️ ការពារដោយ Keycloak SSO · ប្រព័ន្ធសុវត្ថិភាព 2026" !important;
+  display: block !important;
+  font-weight: 500 !important;
+}
+
+/* Hide duplicate external footer outside main card */
+.pf-v5-c-login__footer,
+footer.pf-v5-c-login__footer,
+#kc-info,
+#kc-info-wrapper {
+  display: none !important;
+}
+
+/* Responsive tweaks */
+@media (max-width: 480px) {
+  .pf-v5-c-login {
+    padding: 20px 12px !important;
+  }
+  main.pf-v5-c-login__main {
+    padding: 24px 20px 20px !important;
+    border-radius: 14px !important;
+  }
+  h1#kc-page-title {
+    font-size: 19px !important;
+  }
+}

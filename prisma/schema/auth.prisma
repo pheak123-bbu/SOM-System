@@ -1,0 +1,83 @@
+enum MembershipRole {
+  OWNER
+  ADMIN
+  STAFF
+}
+
+model User {
+  id                      String             @id @default(cuid())
+  name                    String
+  email                   String             @unique
+  passwordHash            String
+  avatarUrl               String?
+  twoFactorSecret         String?
+  twoFactorEnabledAt      DateTime?
+  twoFactorFailedAttempts Int                @default(0)
+  twoFactorLockedUntil    DateTime?
+  twoFactorLastStep       BigInt?
+  twoFactorRecoveryCodes  String[]           @default([])
+  loginFailedAttempts    Int                @default(0)
+  loginLockedUntil       DateTime?
+  mustChangePassword      Boolean            @default(false)
+  authVersion             Int                @default(0)
+  memberships             StoreMembership[]
+  externalIdentities      ExternalIdentity[]
+  reviews                 DetectionReview[]
+  auditLogs               AuditLog[]
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+}
+
+model ExternalIdentity {
+  id        String   @id @default(cuid())
+  issuer    String
+  subject   String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([issuer, subject])
+  @@unique([issuer, userId])
+  @@index([userId])
+}
+
+model Store {
+  id                String              @id @default(cuid())
+  name              String
+  currency          String              @default("USD")
+  timezone          String              @default("Asia/Phnom_Penh")
+  phone             String?
+  address           String?
+  bakongAccountId   String?
+  bankName          String?
+  bankAccountNumber String?
+  bankAccountName   String?
+  exchangeRate      Decimal?            @default(4100) @db.Decimal(12, 2)
+  logoUrl           String?
+  memberships       StoreMembership[]
+  customers         Customer[]
+  products          Product[]
+  orders            Order[]
+  conversations     Conversation[]
+  suggestions       OrderSuggestion[]
+  connections       ChannelConnection[]
+  auditLogs         AuditLog[]
+  stockMovements    StockMovement[]
+  liveSessions      LiveSession[]
+  categories        Category[]
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+}
+
+model StoreMembership {
+  id        String         @id @default(cuid())
+  userId    String
+  storeId   String
+  role      MembershipRole @default(STAFF)
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  store     Store          @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  createdAt DateTime       @default(now())
+
+  @@unique([userId, storeId])
+  @@index([storeId, role])
+}

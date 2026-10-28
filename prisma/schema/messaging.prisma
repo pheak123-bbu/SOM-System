@@ -1,0 +1,48 @@
+model ChannelConnection {
+  id        String       @id @default(cuid())
+  storeId   String
+  channel   SalesChannel
+  status    String       @default("NOT_CONNECTED")
+  metadata  Json?
+  store     Store        @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@unique([storeId, channel])
+}
+
+model Conversation {
+  id            String            @id @default(cuid())
+  storeId       String
+  customerId    String?
+  channel       SalesChannel
+  externalId    String?
+  lastMessageAt DateTime?
+  customer      Customer?         @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  store         Store             @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  messages      Message[]
+  detectionJobs DetectionJob[]
+  suggestions   OrderSuggestion[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@unique([storeId, channel, externalId])
+  @@index([storeId, lastMessageAt])
+}
+
+model Message {
+  id             String               @id @default(cuid())
+  conversationId String
+  externalId     String?
+  senderName     String
+  senderType     String
+  body           String
+  sentAt         DateTime
+  conversation   Conversation         @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  evidence       SuggestionEvidence[]
+  detectionJobs  DetectionJob[]
+  createdAt      DateTime             @default(now())
+
+  @@unique([conversationId, externalId])
+  @@index([conversationId, sentAt])
+}
