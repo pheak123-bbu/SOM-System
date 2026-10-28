@@ -287,8 +287,8 @@ async function main() {
     {
       orderNumber: "SS-DEMO-8291",
       customer: "សុខា មាន",
-      sku: "FS-001",
-      variant: "មធ្យម (M)",
+      sku: "DR-001",
+      variant: "ផ្កាឈូក · M",
       status: OrderStatus.CONFIRMED,
       quantity: 1,
       courier: "VET",
@@ -303,8 +303,8 @@ async function main() {
     {
       orderNumber: "SS-DEMO-8290",
       customer: "បុប្ផា ចាន់",
-      sku: "AC-014",
-      variant: "ក្រហម",
+      sku: "TS-001",
+      variant: "ស · M",
       status: OrderStatus.PENDING_CONFIRMATION,
       quantity: 1,
       courier: "JNT",
@@ -319,10 +319,10 @@ async function main() {
     {
       orderNumber: "SS-DEMO-8289",
       customer: "វិច្ឆិកា កែវ",
-      sku: "HM-003",
-      variant: "ពណ៌ខៀវចាស់",
+      sku: "JK-001",
+      variant: "ពណ៌កាហ្វេ · M",
       status: OrderStatus.SHIPPED,
-      quantity: 5,
+      quantity: 2,
       courier: "FLASH",
       trackingNumber: "FL-551920",
       paymentMethod: "COD",
@@ -335,8 +335,8 @@ async function main() {
     {
       orderNumber: "SS-DEMO-8288",
       customer: "សុខា មាន",
-      sku: "SH-008",
-      variant: "មធ្យម (M)",
+      sku: "JN-001",
+      variant: "ខៀវស្រាល · Size 28 (M)",
       status: OrderStatus.DELIVERED,
       quantity: 2,
       courier: "GRAB",
@@ -351,8 +351,8 @@ async function main() {
     {
       orderNumber: "SS-DEMO-8287",
       customer: "ពិសិដ្ឋ ឡុង",
-      sku: "TR-021",
-      variant: "បន៍ត្នោតខ្ចី · មធ្យម",
+      sku: "TR-001",
+      variant: "ខ្មៅ · M",
       status: OrderStatus.PROCESSING,
       quantity: 1,
       courier: "KERRY",
@@ -367,8 +367,8 @@ async function main() {
     {
       orderNumber: "SS-DEMO-8286",
       customer: "បុប្ផា ចាន់",
-      sku: "SH-008",
-      variant: "តូច (S)",
+      sku: "DR-002",
+      variant: "ខ្មៅ · S",
       status: OrderStatus.CANCELLED,
       quantity: 1,
       courier: "VET",
@@ -479,8 +479,8 @@ async function main() {
   });
   const existingSuggestion = await db.orderSuggestion.findFirst({ where: { storeId: store.id, jobId: demoJob.id } });
   if (!existingSuggestion) {
-    const product = products.get("FS-001")!;
-    const variant = product.variants.find((item) => item.name === "មធ្យម (M)")!;
+    const product = products.get("SK-001")!;
+    const variant = product.variants.find((item) => item.name === "ខ្មៅ · M")!;
     await db.orderSuggestion.create({
       data: {
         storeId: store.id,
@@ -489,7 +489,7 @@ async function main() {
         status: SuggestionStatus.PENDING,
         intent: "PURCHASE_INTENT",
         confidence: 88,
-        extracted: { items: [{ productId: product.id, variantId: variant.id, productName: "Floral Khmer Skirt", variantName: "Medium", quantity: 1 }], requiresSellerReview: true },
+        extracted: { items: [{ productId: product.id, variantId: variant.id, productName: "សំពត់ខ្លីផ្លីសេស្ទីលកូរ៉េ", variantName: "ខ្មៅ · M", quantity: 1 }], requiresSellerReview: true },
         missingInfo: ["អាសយដ្ឋានដឹកជញ្ជូន"],
         explanation: "អតិថិជនបានបង្ហាញបំណងចង់ទិញ និងសួរអំពីការដឹកជញ្ជូន។ ព័ត៌មានអាសយដ្ឋាន និងការបញ្ជាក់ចុងក្រោយនៅតែត្រូវការ។",
         provider: "demo-seed",
@@ -503,7 +503,7 @@ async function main() {
       data: {
         missingInfo: ["អាសយដ្ឋានដឹកជញ្ជូន"],
         explanation: "អតិថិជនបានបង្ហាញបំណងចង់ទិញ និងសួរអំពីការដឹកជញ្ជូន។ ព័ត៌មានអាសយដ្ឋាន និងការបញ្ជាក់ចុងក្រោយនៅតែត្រូវការ។",
-        extracted: { items: [{ productId: products.get("FS-001")!.id, variantId: products.get("FS-001")!.variants.find((item) => item.name === "មធ្យម (M)")!.id, productName: "សំពត់ខ្មែរលំនាំផ្កា", variantName: "មធ្យម (M)", quantity: 1 }], requiresSellerReview: true },
+        extracted: { items: [{ productId: products.get("SK-001")!.id, variantId: products.get("SK-001")!.variants.find((item) => item.name === "ខ្មៅ · M")!.id, productName: "សំពត់ខ្លីផ្លីសេស្ទីលកូរ៉េ", variantName: "ខ្មៅ · M", quantity: 1 }], requiresSellerReview: true },
       },
     });
   }
